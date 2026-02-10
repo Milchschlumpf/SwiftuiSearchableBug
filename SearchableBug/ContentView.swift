@@ -7,44 +7,45 @@
 
 import SwiftUI
 
+enum Page {
+    case main
+    case search
+}
+
 struct ContentView: View {
     @State var selectedTab: Page = Page.main
     
     var body: some View {
         NavigationStack {
-            ZStack {
-                VStack {
-                    switch selectedTab {
-                    case .main:
-                        MainView()
-                    case .search:
-                        SearchView()
-                    }
+            VStack {
+                switch selectedTab {
+                case .main:
+                    MainView()
+                case .search:
+                    SearchView()
                 }
                 
-                VStack {
-                    Spacer()
-                    
-                    VStack(spacing: 0) {
-                        HStack(spacing: 0) {
-                            TabBarIcon(iconName: "house", selected: selectedTab == .main, displayName: "Home")
-                                .onTapGesture {
-                                    selectedTab = .main
-                                }
-                            
-                            TabBarIcon(iconName: "magnifyingglass", selected: selectedTab == .search, displayName: "Search")
-                                .onTapGesture {
-                                    selectedTab = .search
-                                }
-                            
-                        }
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 55)
-                        .background(Color.gray)
-                        .shadow(color: Color.gray, radius: 0)
+                Spacer()
+            }
+            .safeAreaInset(edge: .bottom) {
+                VStack(spacing: 0) {
+                    HStack(spacing: 0) {
+                        TabBarIcon(iconName: "house", selected: selectedTab == .main, displayName: "Home")
+                            .onTapGesture {
+                                selectedTab = .main
+                            }
+                        
+                        TabBarIcon(iconName: "magnifyingglass", selected: selectedTab == .search, displayName: "Search")
+                            .onTapGesture {
+                                selectedTab = .search
+                            }
+                        
                     }
-                    .ignoresSafeArea(.all, edges: .bottom)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 55)
+                    .background(Color.gray)
                 }
+                .ignoresSafeArea(.all, edges: .bottom)
             }
         }
     }
@@ -74,7 +75,49 @@ struct TabBarIcon: View {
     }
 }
 
-enum Page {
-    case main
-    case search
+struct MainView: View {
+    var body: some View {
+        VStack {
+            Image(systemName: "globe")
+                .imageScale(.large)
+                .foregroundStyle(.tint)
+            Text("Hello, world!")
+        }
+        .padding()
+        .navigationTitle("Home")
+    }
 }
+
+struct SearchView: View {
+    @State private var searchText = ""
+    
+    let items = [
+        "Apple",
+        "Banana",
+        "Pear",
+        "Strawberry",
+        "Orange",
+        "Peach",
+        "Grape",
+        "Mango"
+    ]
+    
+    var filteredItems: [String] {
+        if searchText.isEmpty {
+            return items
+        } else {
+            return items.filter {
+                $0.localizedCaseInsensitiveContains(searchText)
+            }
+        }
+    }
+    
+    var body: some View {
+        List(filteredItems, id: \.self) { item in
+            Text(item)
+        }
+        .navigationTitle("Fruits")
+        .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search")
+    }
+}
+
